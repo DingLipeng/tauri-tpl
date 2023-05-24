@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# My custom dev
+# because it is generated
+components.d.ts

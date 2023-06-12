@@ -13,6 +13,7 @@ Tauri 跨平台桌面应用开发模板
 
 ```shell
 npm i -g sort-package-json
+
 cargo install cargo-outdated
 
 ```
@@ -24,7 +25,15 @@ git clone https://github.com/DingLipeng/tauri-tpl.git my-project
 cd my-project
 
 npm install
+
 npm run start
+
+```
+
+## 查看tauri版本
+
+```shell
+npm run tauri info
 
 ```
 

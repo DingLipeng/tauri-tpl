@@ -57,6 +57,29 @@ npm run tauri info
 * [ElementPlus](https://element-plus.gitee.io/zh-CN/)
 * [Jetbrains Mono](https://www.jetbrains.com/lp/mono/)
 
+## 生成icon
+
+[参考](https://tauri.app/v1/guides/features/icons/)
+
+```shell
+cargo tauri icon [OPTIONS] [INPUT]
+
+npm run tauri icon "PATH"
+
+
+```
+
+## 组件版本检查
+
+[cargo-outdated](https://github.com/kbknapp/cargo-outdated#installation-and-usage)
+
+```shell
+npm outdated
+
+cargo outdated
+
+```
+
 # Original Official Document
 
 ## Tauri + Vue 3 + TypeScript

@@ -12,9 +12,17 @@ Tauri 跨平台桌面应用开发模板
 全局组件、依赖
 
 ```shell
-npm i -g sort-package-json
+npm i -g sort-package-json sort-json
 
 cargo install cargo-outdated
+
+cargo install cargo-edit
+
+```
+
+```shell
+# example
+npx sort-json tsconfig.json
 
 ```
 
@@ -76,9 +84,29 @@ npm run tauri icon "PATH"
 ```shell
 npm outdated
 
+# require installed cargo-outdated
 cargo outdated
 
 ```
+
+### 同步新版本tauri配置
+
+```shell
+npm run update --save
+
+cargo upgrade
+
+# 对于已有项目，新创建独立分支执行，以查看变更差异
+# 配置文件结合sort-json排序后对比
+npm run tauri init -- --force
+
+npx sort-json src-tauri/tauri.conf.json
+
+```
+
+## 下游软件使用更新
+
+IDE context menu on origin/main: `Pull into 'YOUR_BRANCH' Using Merge`
 
 # Original Official Document
 

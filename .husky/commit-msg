@@ -1,0 +1,9 @@
+#!/bin/sh
+# >>> git-commit-message <<<
+checker=""
+if [ -f "$HOME/.agents/skills/git-commit-message/scripts/check-commit-msg.js" ]; then checker="$HOME/.agents/skills/git-commit-message/scripts/check-commit-msg.js"
+elif [ -f "/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/check-commit-msg.js" ]; then checker="/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/check-commit-msg.js"
+fi
+[ -n "$checker" ] || exit 0
+node "$checker" "$1" || exit $?
+# <<< git-commit-message <<<

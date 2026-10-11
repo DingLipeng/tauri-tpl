@@ -1,4 +1,20 @@
 #!/usr/bin/env sh
+# >>> commit-set-report:snapshot <<<
+reporter=""
+if [ -f "$HOME/.agents/skills/git-commit-message/scripts/commit-set-report.js" ]; then reporter="$HOME/.agents/skills/git-commit-message/scripts/commit-set-report.js"
+elif [ -f "/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/commit-set-report.js" ]; then reporter="/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/commit-set-report.js"
+fi
+if [ -n "$reporter" ]; then node "$reporter" --snapshot >/dev/null 2>&1 || true; fi
+# <<< commit-set-report:snapshot <<<
+
 . "$(dirname -- "$0")/_/husky.sh"
 
 npx lint-staged
+
+# >>> commit-set-report:report <<<
+reporter=""
+if [ -f "$HOME/.agents/skills/git-commit-message/scripts/commit-set-report.js" ]; then reporter="$HOME/.agents/skills/git-commit-message/scripts/commit-set-report.js"
+elif [ -f "/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/commit-set-report.js" ]; then reporter="/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/commit-set-report.js"
+fi
+if [ -n "$reporter" ]; then node "$reporter" || true; fi
+# <<< commit-set-report:report <<<

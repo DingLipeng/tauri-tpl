@@ -1,10 +1,32 @@
 #!/usr/bin/env sh
 # >>> commit-set-report:snapshot <<<
-reporter=""
-if [ -f "$HOME/.agents/skills/git-commit-message/scripts/commit-set-report.js" ]; then reporter="$HOME/.agents/skills/git-commit-message/scripts/commit-set-report.js"
-elif [ -f "/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/commit-set-report.js" ]; then reporter="/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/commit-set-report.js"
+gate_bin=""
+od_posix=""
+if [ -n "$OneDrive" ] && command -v cygpath >/dev/null 2>&1; then
+  od_posix=$(cygpath -u "$OneDrive" 2>/dev/null) || od_posix=""
 fi
-if [ -n "$reporter" ]; then node "$reporter" --snapshot >/dev/null 2>&1 || true; fi
+for cand in "$od_posix/cli/gate.exe" "/d/OneDrive/cli/gate.exe" "/mnt/d/OneDrive/cli/gate" "$HOME/OneDrive/cli/gate.exe" "$HOME/OneDrive/cli/gate"; do
+  if [ -f "$cand" ]; then gate_bin="$cand"; break; fi
+done
+if [ -n "$gate_bin" ] && [ -f "$(dirname "$gate_bin")/gate.off" ]; then gate_bin=""; fi
+gate_done=""
+if [ -n "$gate_bin" ] && [ -z "$OCV_GATE_OFF" ]; then
+  if [ -n "$OCV_GATE_TRACE" ]; then printf '[GATE-TRACE] snapshot engine=gate %s\n' "$gate_bin" >&2; fi
+  rc=0
+  "$gate_bin" snapshot >/dev/null 2>&1 || rc=$?
+  case $rc in
+    126 | 127) ;;
+    *) gate_done=1 ;;
+  esac
+fi
+if [ -z "$gate_done" ]; then
+  reporter=""
+  if [ -f "$HOME/.agents/skills/git-commit-message/scripts/commit-set-report.js" ]; then reporter="$HOME/.agents/skills/git-commit-message/scripts/commit-set-report.js"
+  elif [ -f "/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/commit-set-report.js" ]; then reporter="/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/commit-set-report.js"
+  fi
+  if [ -n "$OCV_GATE_TRACE" ] && [ -n "$reporter" ]; then printf '[GATE-TRACE] snapshot engine=node %s\n' "$reporter" >&2; fi
+  if [ -n "$reporter" ]; then node "$reporter" --snapshot >/dev/null 2>&1 || true; fi
+fi
 # <<< commit-set-report:snapshot <<<
 
 . "$(dirname -- "$0")/_/husky.sh"
@@ -12,9 +34,31 @@ if [ -n "$reporter" ]; then node "$reporter" --snapshot >/dev/null 2>&1 || true;
 npx lint-staged
 
 # >>> commit-set-report:report <<<
-reporter=""
-if [ -f "$HOME/.agents/skills/git-commit-message/scripts/commit-set-report.js" ]; then reporter="$HOME/.agents/skills/git-commit-message/scripts/commit-set-report.js"
-elif [ -f "/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/commit-set-report.js" ]; then reporter="/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/commit-set-report.js"
+gate_bin=""
+od_posix=""
+if [ -n "$OneDrive" ] && command -v cygpath >/dev/null 2>&1; then
+  od_posix=$(cygpath -u "$OneDrive" 2>/dev/null) || od_posix=""
 fi
-if [ -n "$reporter" ]; then node "$reporter" || true; fi
+for cand in "$od_posix/cli/gate.exe" "/d/OneDrive/cli/gate.exe" "/mnt/d/OneDrive/cli/gate" "$HOME/OneDrive/cli/gate.exe" "$HOME/OneDrive/cli/gate"; do
+  if [ -f "$cand" ]; then gate_bin="$cand"; break; fi
+done
+if [ -n "$gate_bin" ] && [ -f "$(dirname "$gate_bin")/gate.off" ]; then gate_bin=""; fi
+gate_done=""
+if [ -n "$gate_bin" ] && [ -z "$OCV_GATE_OFF" ]; then
+  if [ -n "$OCV_GATE_TRACE" ]; then printf '[GATE-TRACE] report engine=gate %s\n' "$gate_bin" >&2; fi
+  rc=0
+  "$gate_bin" report || rc=$?
+  case $rc in
+    126 | 127) ;;
+    *) gate_done=1 ;;
+  esac
+fi
+if [ -z "$gate_done" ]; then
+  reporter=""
+  if [ -f "$HOME/.agents/skills/git-commit-message/scripts/commit-set-report.js" ]; then reporter="$HOME/.agents/skills/git-commit-message/scripts/commit-set-report.js"
+  elif [ -f "/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/commit-set-report.js" ]; then reporter="/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/commit-set-report.js"
+  fi
+  if [ -n "$OCV_GATE_TRACE" ] && [ -n "$reporter" ]; then printf '[GATE-TRACE] report engine=node %s\n' "$reporter" >&2; fi
+  if [ -n "$reporter" ]; then node "$reporter" || true; fi
+fi
 # <<< commit-set-report:report <<<

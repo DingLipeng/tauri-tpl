@@ -1,13 +1,15 @@
 #!/usr/bin/env sh
 # >>> commit-set-report:snapshot <<<
+# gate 解析：OCV_GATE_BIN 显式覆盖 > 字面候选（免 cygpath spawn）> $OneDrive 动态兜底（懒求值）
 gate_bin=""
-od_posix=""
-if [ -n "$OneDrive" ] && command -v cygpath >/dev/null 2>&1; then
-  od_posix=$(cygpath -u "$OneDrive" 2>/dev/null) || od_posix=""
-fi
-for cand in "$od_posix/cli/gate.exe" "/d/OneDrive/cli/gate.exe" "/mnt/d/OneDrive/cli/gate" "$HOME/OneDrive/cli/gate.exe" "$HOME/OneDrive/cli/gate"; do
-  if [ -f "$cand" ]; then gate_bin="$cand"; break; fi
+if [ -n "$OCV_GATE_BIN" ] && [ -f "$OCV_GATE_BIN" ]; then gate_bin="$OCV_GATE_BIN"; fi
+for cand in "/d/OneDrive/cli/gate.exe" "/mnt/d/OneDrive/cli/gate" "$HOME/OneDrive/cli/gate.exe" "$HOME/OneDrive/cli/gate"; do
+  if [ -z "$gate_bin" ] && [ -f "$cand" ]; then gate_bin="$cand"; break; fi
 done
+if [ -z "$gate_bin" ] && [ -n "$OneDrive" ] && command -v cygpath >/dev/null 2>&1; then
+  od_posix=$(cygpath -u "$OneDrive" 2>/dev/null) || od_posix=""
+  if [ -n "$od_posix" ] && [ -f "$od_posix/cli/gate.exe" ]; then gate_bin="$od_posix/cli/gate.exe"; fi
+fi
 if [ -n "$gate_bin" ] && [ -f "$(dirname "$gate_bin")/gate.off" ]; then gate_bin=""; fi
 gate_done=""
 if [ -n "$gate_bin" ] && [ -z "$OCV_GATE_OFF" ]; then
@@ -34,14 +36,16 @@ fi
 npx lint-staged
 
 # >>> commit-set-report:report <<<
+# gate 解析：OCV_GATE_BIN 显式覆盖 > 字面候选（免 cygpath spawn）> $OneDrive 动态兜底（懒求值）
 gate_bin=""
-od_posix=""
-if [ -n "$OneDrive" ] && command -v cygpath >/dev/null 2>&1; then
-  od_posix=$(cygpath -u "$OneDrive" 2>/dev/null) || od_posix=""
-fi
-for cand in "$od_posix/cli/gate.exe" "/d/OneDrive/cli/gate.exe" "/mnt/d/OneDrive/cli/gate" "$HOME/OneDrive/cli/gate.exe" "$HOME/OneDrive/cli/gate"; do
-  if [ -f "$cand" ]; then gate_bin="$cand"; break; fi
+if [ -n "$OCV_GATE_BIN" ] && [ -f "$OCV_GATE_BIN" ]; then gate_bin="$OCV_GATE_BIN"; fi
+for cand in "/d/OneDrive/cli/gate.exe" "/mnt/d/OneDrive/cli/gate" "$HOME/OneDrive/cli/gate.exe" "$HOME/OneDrive/cli/gate"; do
+  if [ -z "$gate_bin" ] && [ -f "$cand" ]; then gate_bin="$cand"; break; fi
 done
+if [ -z "$gate_bin" ] && [ -n "$OneDrive" ] && command -v cygpath >/dev/null 2>&1; then
+  od_posix=$(cygpath -u "$OneDrive" 2>/dev/null) || od_posix=""
+  if [ -n "$od_posix" ] && [ -f "$od_posix/cli/gate.exe" ]; then gate_bin="$od_posix/cli/gate.exe"; fi
+fi
 if [ -n "$gate_bin" ] && [ -f "$(dirname "$gate_bin")/gate.off" ]; then gate_bin=""; fi
 gate_done=""
 if [ -n "$gate_bin" ] && [ -z "$OCV_GATE_OFF" ]; then

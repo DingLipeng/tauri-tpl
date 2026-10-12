@@ -1,9 +1,33 @@
 #!/bin/sh
 # >>> git-commit-message <<<
-checker=""
-if [ -f "$HOME/.agents/skills/git-commit-message/scripts/check-commit-msg.js" ]; then checker="$HOME/.agents/skills/git-commit-message/scripts/check-commit-msg.js"
-elif [ -f "/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/check-commit-msg.js" ]; then checker="/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/check-commit-msg.js"
+gate_bin=""
+od_posix=""
+if [ -n "$OneDrive" ] && command -v cygpath >/dev/null 2>&1; then
+  od_posix=$(cygpath -u "$OneDrive" 2>/dev/null) || od_posix=""
 fi
-[ -n "$checker" ] || exit 0
-node "$checker" "$1" || exit $?
+for cand in "$od_posix/cli/gate.exe" "/d/OneDrive/cli/gate.exe" "/mnt/d/OneDrive/cli/gate" "$HOME/OneDrive/cli/gate.exe" "$HOME/OneDrive/cli/gate"; do
+  if [ -f "$cand" ]; then gate_bin="$cand"; break; fi
+done
+if [ -n "$gate_bin" ] && [ -f "$(dirname "$gate_bin")/gate.off" ]; then gate_bin=""; fi
+gate_rc=""
+if [ -n "$gate_bin" ] && [ -z "$OCV_GATE_OFF" ]; then
+  if [ -n "$OCV_GATE_TRACE" ]; then printf '[GATE-TRACE] commit-msg engine=gate %s\n' "$gate_bin" >&2; fi
+  rc=0
+  "$gate_bin" check-msg "$1" || rc=$?
+  case $rc in
+    126 | 127) ;;
+    *) gate_rc="$rc" ;;
+  esac
+fi
+if [ -z "$gate_rc" ]; then
+  checker=""
+  if [ -f "$HOME/.agents/skills/git-commit-message/scripts/check-commit-msg.js" ]; then checker="$HOME/.agents/skills/git-commit-message/scripts/check-commit-msg.js"
+  elif [ -f "/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/check-commit-msg.js" ]; then checker="/mnt/c/Users/DanielTing/.agents/skills/git-commit-message/scripts/check-commit-msg.js"
+  fi
+  [ -n "$checker" ] || exit 0
+  if [ -n "$OCV_GATE_TRACE" ]; then printf '[GATE-TRACE] commit-msg engine=node %s\n' "$checker" >&2; fi
+  node "$checker" "$1" || exit $?
+  exit 0
+fi
+exit "$gate_rc"
 # <<< git-commit-message <<<
